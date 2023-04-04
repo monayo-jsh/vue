@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <title>Title</title>
+</head>
+<body>
+  <div id="app">
+    <h1>보간법</h1>
+    <h2>문자열</h2>
+    <span>메시지: {{ msg }}</span><p/>
+    문자열: 데이터 바인딩의 가장 기본 형태는 "이중 중괄호"를 사용한 텍스트 보간<p/>
+    <span v-once>다시는 변경하지 않습니다: {{ msg }}</span><p/>
+    v-once 디렉티브를 사용하여 일회성 보간 수행 가능, 같은 노드의 바인딩에도 영향을 미친다는 점을 유의<p/>
+  </div>
+
+  <hr/>
+
+  <div id="html">
+    <h2>원시 HTML</h2>
+    "이중 중괄호"는 HTML이 아닌 일반 텍스트 데이터를 해석<p/>
+    실제 HTML을 출력하려면 v-html 디렉티브를 사용해야 함
+
+    <p>Using mustaches: {{ rawHtml }}</p>
+    <p>Using v-html directive: <span v-html="rawHtml"></span></p>
+
+    웹사이트에서 임의의 HTML을 동적으로 렌더링하려면 XSS 취약점으로 쉽게 이어질 수 있으므로 매우 위험할 가능성이 있습니다. <p></p>
+    신뢰할 수 있는 콘텐츠에서만 HTML 보간을 사용하고 사용자가 제공한 콘텐츠에서는 절대 사용하면 안됩니다. <p></p>
+  </div>
+
+  <hr/>
+
+  <div id="attr">
+    <h2>속성</h2>
+    <p>"이중 중괄호"는 HTML 속성에서 사용할 수 없습니다. 대신 v-bind 디렉티브를 사용</p>
+    <div v-bind:id="dynamicId">이 Element Id는 v-bind 디렉티브된 ID가 적용됨</div><p></p>
+    <p>boolean 속성을 사용할 때 단순히 true인 경우 v-bind는 조금 다르게 작동합니다.</p>
+    <p>isButtonDisabled가 null, undefined 또는 false의 값을 가지면 disabled 속성은 렌더링 된 button 엘리먼트에 포함되지 않습니다.</p>
+    <button v-bind:disabled="isButtonDisabled">Button</button>
+  </div>
+
+  <hr/>
+
+  <div id="javascript">
+    <h2>JavaScript 표현식 사용</h2>
+    <p>지금까지 템플릿의 간단한 속성 키에만 바인딩했습니다.</p>
+    <p>그러나 실제로 Vue.js는 모든 데이터 바인딩 내에서 JavaScript 표현식의 모든 기능을 지원합니다.</p>
+    <p>number + 1 : {{ number + 1 }} </p>
+
+    <p>ok ? {{ ok ? 'YES' : 'NO' }}</p>
+
+    <p>message reverse : {{ message.split('').reverse().join('') }}</p>
+
+    <div v-bind:id="'list-' + id">여기 id는 list-100 !</div>
+
+    <p>이 표현식은 Vue 인스턴스 데이터 범위 내에서 JavaScript로 계산됩니다.</p>
+    <p>한가지 제한사항은 각 바인딩에 하나의 단일 표현식 만 포함될 수 있으므로 아래처럼 작성하면 안됩니다</p>
+
+    <!-- 아래는 구문입니다, 표현식이 아닙니다. -->
+    <!-- {{ var a = 1 }} -->
+
+    <!-- 조건문은 작동하지 않습니다. 삼항 연산자를 사용해야 합니다. -->
+    <!-- {{ if (ok) { return message } }} -->
+  </div>
+
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        msg: '문자열 보간법 확인'
+      }
+    })
+
+    var html = new Vue({
+      el: '#html',
+      data: {
+        rawHtml: '<span style="color:red">This should be red.</span>'
+      }
+    })
+
+    var attr = new Vue({
+      el: '#attr',
+      data: {
+        dynamicId: 'eleId',
+        isButtonDisabled: true
+      }
+    })
+
+    var javascript = new Vue({
+      el: '#javascript',
+      data: {
+        number: 0,
+        ok: false,
+        message: '안녕하세요',
+        id: '100'
+      }
+    })
+  </script>
+</body>
+</html>

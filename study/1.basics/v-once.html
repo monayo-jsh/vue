@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <title>message</title>
+</head>
+<body>
+<div id="app">
+  <span v-once>v-once 디렉티브는 일회성 보간으로 변경되지 않음 : {{ message }}</span>
+</div>
+</body>
+</html>
+
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      message: '안녕하세요 Vue!'
+    }
+  })
+</script>
