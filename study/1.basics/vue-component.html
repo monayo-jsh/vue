@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <title>v-model</title>
+</head>
+<body>
+<div id="app">
+  <p>{{ message }}</p>
+  <input v-model="message">
+
+  <p/>
+  v-model 디렉티브는 입력과 앱 상태를 양방향으로 바인딩 제공
+</div>
+</body>
+</html>
+
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      message: '안녕하세요! Vue.js!'
+    }
+  })
+</script>

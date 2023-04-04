@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <title>message</title>
+</head>
+<body>
+<div id="app">
+  {{ message }}
+</div>
+</body>
+</html>
+
+<script>
+  var app = new Vue({
+    el: '#app',
+    data: {
+      message: '안녕하세요 Vue!\napp.message = {새로운 메시지} 입력 시 HTML 속성이 업데이트 됩니다'
+    }
+  })
+</script>
