@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <title>Title</title>
+</head>
+<body>
+  <p>디렉티브는 v- 접두사가 있는 특수 속성</p>
+  <p>디렉티브의 역할은 표현식의 값이 변경될 때 사이드이펙트를 반응적으로 DOM에 적용하는 것</p>
+  <div id="if">
+    <h2>v-if</h2>
+    <p v-if="seen">이제 나를 볼 수 있어요</p>
+    <button v-on:click="changeSeen">삽입/제거</button>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#if',
+      data: {
+        seen: true
+      },
+      methods: {
+        changeSeen: function() {
+          this.seen = !this.seen
+        }
+      }
+    })
+  </script>
+
+  <div>
+    <h2>전달인자</h2>
+    <p>일부 디렉티브는 콜론으로 표시되는 “전달인자”를 사용할 수 있습니다.</p>
+    <p>예를 들어, v-bind 디렉티브는 반응적으로 HTML 속성을 갱신하는데 사용</p>
+    <div id="bind">
+      <p>v-bind:href="url" 는 엘리먼트의 href 속성을 표현식 url의 값에 바인드하는 v-bind 디렉티브에게 알려줍니다.</p>
+      <p><a v-bind:href="url">클릭하면 네이버로 이동합니다.</a></p>
+      <p>DOM 이벤트를 수신하는 v-on 디렉티브입니다. 전달인자는 이벤트를 받을 이름입니다.</p>
+      <p><a v-on:click="doSomething" style="cursor: pointer">클릭하면 얼럿이 발생합니다.</a></p>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#bind',
+      data: {
+        url: 'https://naver.com'
+      },
+      methods: {
+        doSomething: function() {
+          alert('v-on 디렉티브 클릭!');
+        }
+      }
+    })
+  </script>
+
+  <div>
+    <h2>동적 전달인자</h2>
+    <p>2.6.0+ 에서 추가됨</p>
+    <p>in-DOM 탬플릿을 사용할 때에는 (탬플릿이 HTML파일에 직접 쓰여진 경우), <span style="color: red">브라우저가 모든 속성명을 소문자로 만드는 관계로 대문자의 사용을 피하는것이 좋습니다</span></p>
+    <div id="dynamic">
+      <p>a v-bind:[attributeName]="url" 로 작성되면 attributeName은 javscript 형식으로 동적 변환되어, 최종적인 밸류로 사용됨</p>
+      <p>여기서 attributeName 이 href 의 값을 가진다면 v-bind:href 와 동등</p>
+      <p><a v-bind:[attributeName]="url">클릭하면 네이버로 이동합니다.</a></p>
+      <p>동적인 이벤트명에 핸들러를 바인딩 할 때 동적 전달인자를 활용</p>
+      <p>v-on:[eventName]="doSomething" 로 작성되면 eventName의 값이 focus라고 한다면 v-on:[eventName] 는 v-on:focus 와 동등</p>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#dynamic',
+      data: {
+        attributename: 'href',
+        url: 'https://naver.com'
+      }
+    })
+  </script>
+
+  <div>
+    <h2>수식어</h2>
+    <p>수식어는 점으로 표시되는 특수 접미사로, 디렉티브를 특별한 방법으로 바인딩 해야 함</p>
+    <p>예를 들어, .prevent 수식어는 트리거된 이벤트에서 event.preventDefault()를 호출하도록 v-on 디렉티브에게 알려줍니다.</p>
+    <p>form v-on:submit.prevent="onSubmit"</p>
+  </div>
+
+  <div>
+    <h2>v-bind 약어</h2>
+    <p>v- 접두어의 필요성이 떨어집니다.</p>
+    <p>전체 문법 : a v-bind:href="url"</p>
+    <p>약어 : a :href="url"</p>
+    <p>2.6.0+ : a :[key]="url"</p>
+    <div id="abbr-v-bind">
+      <p><a :href="url">네이버로 이동합니다.</a></p>
+      <p><a :[key]="url">네이버로 이동합니다.</a></p>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#abbr-v-bind',
+      data: {
+        url: 'https://naver.com',
+        key: 'href'
+      }
+    })
+  </script>
+
+  <div>
+    <h2>v-on 약어</h2>
+    <p>전체 문법 : a v-on:click="doSomething"</p>
+    <p>약어 : a @click="doSomething" </p>
+    <p>2.6.0+ : @[event]="doSomething"</p>
+    <div id="abbr-v-on">
+      <p><a @click="doSomething">알럿 발생</a></p>
+      <p><a @[event]="doSomething">알럿 발생</a></p>
+    </div>
+  </div>
+
+  <script>
+    new Vue({
+      el: '#abbr-v-on',
+      data: {
+        event: 'click'
+      },
+      methods: {
+        doSomething: function () {
+          alert('알럿 발생')
+        }
+      }
+    })
+  </script>
+</body>
+</html>
