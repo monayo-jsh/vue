@@ -6,24 +6,177 @@
   <title>v-if</title>
 </head>
 <body>
-<div id="app">
-  <p v-if="seen">
-    이제 나를 볼 수 있어요
-    <br/>
-    app.seen = false를 입력하면 메시지가 사라져요.
-  </p>
+<div>
+  <div>
+    <h2>v-if</h2>
+    <p>v-if 디렉티브는 조건에 따라 블록을 렌더링하기 위해 사용됩니다.</p>
+    <p>블록은 디렉티브의 표현식이 true 값을 반환할 때만 렌더링</p>
+    <div id="app">
+      <p v-if="seen">
+        이제 나를 볼 수 있어요
+        <br/>
+        app.seen = false를 입력하면 메시지가 사라져요.
+      </p>
+    </div>
+    <script>
+      var app = new Vue({
+        el: '#app',
+        data: {
+          seen: true
+        }
+      })
+    </script>
+
+    <p>v-else 와 함께 “else 블록”을 추가하는 것도 가능합니다.</p>
+    <div id="if">
+      <h3 v-if="awesome">Vue is awesome!</h3>
+      <h3 v-else>Oh no 😢</h3>
+
+      <p>app.awesome = false를 입력하면 v-else 메시지가 렌더링됩니다.</p>
+    </div>
+    <script>
+      var vif = new Vue({
+        el: "#if",
+        data: {
+          awesome: true
+        }
+      })
+    </script>
+  </div>
+  <div>
+    <h2>< template > 에 v-if 을 갖는 조건부 그룹 만들기</h2>
+    <p>v-if는 디렉티브기 때문에 하나의 엘리먼트에 추가해야합니다. </p>
+    <p>하지만 하나 이상의 엘리먼트를 트랜지션하려면 어떻게 해야할까요?</p>
+    <p>이 경우 우리는 보이지 않는 래퍼 역할을 하는 < template > 엘리먼트에 v-if를 사용할 수 있습니다</p>
+    <p>최종 렌더링 결과에는 < template > 엘리먼트가 포함되지 않습니다.</p>
+
+    <div id="template-v-if">
+      <template v-if="ok">
+        <h3>Title</h3>
+        <p>Paragraph 1</p>
+        <p>Paragraph 2</p>
+      </template>
+    </div>
+    <script>
+      new Vue({
+        el: '#template-v-if',
+        data: {
+          ok: true
+        }
+      })
+    </script>
+  </div>
+  <div>
+    <h2>v-else</h2>
+    <p>v-else 디렉티브를 사용하여 v-if에 대한 “else 블록”을 나타낼 수 있습니다</p>
+    <div id="v-else">
+      <div v-if="Math.random() > 0.5">
+        이제 나를 볼 수 있어요
+      </div>
+      <div v-else>
+        이제는 안보입니다
+      </div>
+    </div>
+    <p>v-else 엘리먼트는 v-if 엘리먼트 또는 v-else-if 엘리먼트 바로 뒤에 있어야 합니다. 그렇지 않으면 인식할 수 없습니다.</p>
+  </div>
+  <script>
+    new Vue({
+      el: '#v-else'
+    })
+  </script>
+
+  <div>
+    <h2>v-else-if</h2>
+    <p>v-else-if는 이름에서 알 수 있듯, v-if에 대한 “else if 블록” 역할을 합니다. 또한 여러 개를 사용할 수 있습니다.</p>
+
+    <div id="v-else-if">
+      <div v-if="type === 'A'">
+        A
+      </div>
+      <div v-else-if="type === 'B'">
+        B
+      </div>
+      <div v-else-if="type === 'C'">
+        C
+      </div>
+      <div v-else>
+        Not A/B/C
+      </div>
+      <input v-model="type">
+    </div>
+  </div>
+  <p>v-else와 마찬가지로, v-else-if 엘리먼트는 v-if 또는 v-else-if 엘리먼트 바로 뒤에 와야 합니다.</p>
+  <script>
+    new Vue({
+      el: '#v-else-if',
+      data: {
+        type: 'A'
+      }
+    })
+  </script>
+
+  <div>
+    <h2>key를 이용한 재사용 가능한 엘리먼트 제어</h2>
+    <div id="no-key-reuse">
+      <p>다음 코드에서 loginType을 바꾸어도 사용자가 이미 입력한 내용은 지워지지 않습니다.</p>
+      <p>두 템플릿 모두 같은 요소를 사용하므로 < input >은 대체되지 않고 단지 placeholder 만 변경됩니다.</p>
+      <template v-if="loginType === 'username'">
+        <label>사용자 이름</label>
+        <input placeholder="사용자 이름을 입력하세요">
+      </template>
+      <template v-else>
+        <label>이메일</label>
+        <input placeholder="이메일 주소를 입력하세요">
+      </template>
+      <button v-on:click="toggleLoginType">로그인 유형 변경</button>
+    </div>
+    <script>
+      new Vue({
+        el: '#no-key-reuse',
+        data: {
+          loginType: 'username'
+        },
+        methods: {
+          toggleLoginType: function() {
+            this.loginType = this.loginType === 'username' ? 'email' : 'username'
+          }
+        }
+      })
+    </script>
+
+    <div id="key-reuse">
+      <p>이것은 항상 바람직하지는 않습니다.</p>
+      <p>때문에 “이 두 엘리먼트는 완전히 별개이므로 다시 사용하지 마십시오.”라고 알리는 방법을 제공합니다.</p>
+      <p>유일한 값으로 key 속성을 추가하십시오.</p>
+
+      <template v-if="loginType === 'username'">
+        <label>사용자 이름</label>
+        <input placeholder="사용자 이름을 입력하세요" key="username-input">
+      </template>
+      <template v-else>
+        <label>이메일</label>
+        <input placeholder="이메일 주소를 입력하세요" key="email-input">
+      </template>
+
+      <button v-on:click="toggleLoginType">로그인 유형 변경</button>
+    </div>
+
+    <script>
+      new Vue({
+        el: '#key-reuse',
+        data: {
+          loginType: 'username'
+        },
+        methods: {
+          toggleLoginType: function() {
+            this.loginType = this.loginType === 'username' ? 'email' : 'username'
+          }
+        }
+      })
+    </script>
+
+    <p>< label > 엘리먼트는 key 속성이 없기 때문에 여전히 효율적으로 재사용 됩니다.</p>
+  </div>
 </div>
 </body>
 </html>
-
-
-<script>
-
-  var app = new Vue({
-    el: '#app',
-    data: {
-      seen: true
-    }
-  })
-
-</script>
