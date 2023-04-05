@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <title>Title</title>
+</head>
+<body>
+  <p>Vue는 Vue 인스턴스의 데이터 변경을 관찰하고 이에 반응하는 보다 일반적인 watch 속성을 제공</p>
+  <p>watch 속성은 감시할 데이터를 지정하고 그 데이터가 바뀌면 이런 함수를 실행하라는 방식으로 소프트웨어 공학에서 이야기하는 ‘명령형 프로그래밍’ 방식.</p>
+  <p>computed 속성은 계산해야 하는 목표 데이터를 정의하는 방식으로 소프트웨어 공학에서 이야기하는 ‘선언형 프로그래밍’ 방식.</p>
+  <div>
+    <h2>watch</h2>
+    <div id="watch">{{ fullName }}</div>
+  </div>
+  <script>
+    var watch = new Vue({
+      el: '#watch',
+      data: {
+        firstName: 'SangHyun',
+        lastName: 'Ju',
+        fullName: 'SangHyun Ju'
+      },
+      watch: {
+        firstName: function(val) {
+          this.fullName = val + ' ' + this.lastName
+        },
+        lastName: function(val) {
+          this.fullName = this.firstName + ' ' + val
+        }
+      }
+    })
+  </script>
+
+  <div>
+    <h2>computed</h2>
+    <div id="computed">{{ fullName }}</div>
+  </div>
+  <script>
+    var computed = new Vue({
+      el: '#computed',
+      data: {
+        firstName: 'SangHyun',
+        lastName: 'Ju'
+      },
+      computed: {
+        fullName: function () {
+          return this.firstName + ' ' + this.lastName
+        }
+      }
+    })
+  </script>
+</body>
+</html>
