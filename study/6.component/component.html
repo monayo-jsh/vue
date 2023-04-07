@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <title>component</title>
+</head>
+<body>
+<div>
+  <h1>컴포넌트</h1>
+  <p>기본 HTML 엘리먼트를 확장하여 재사용 가능한 코드를 캡슐화하는 데 도움</p>
+  <p>상위 수준에서 컴포넌트는 Vue의 컴파일러에 의해 동작이 추가된 사용자 지정 엘리먼트</p>
+  <p>경우에 따라 특별한 is 속성으로 확장 된 원시 HTML 엘리먼트로 나타날 수도 있습니다.</p>
+  <p>Vue 컴포넌트는 Vue 인스턴스이기도 합니다. 그러므로 모든 옵션 객체를 사용할 수 있습니다. (루트에만 사용하는 옵션은 제외) 그리고 같은 라이프사이클 훅을 사용할 수 있습니다.</p>
+
+  <div>
+    <h2>컴포넌트 사용하기</h2>
+
+    <div>
+      <h3>전역 등록</h3>
+      <p>전역 컴포넌트를 등록하려면, Vue.component(tagName, options)를 사용</p>
+      <p>ex: Vue.component('my-component', { //options })</p>
+      <p>Vue는 사용자 지정 태그 이름에 대해 [W3C 규칙](http://www.w3.org/TR/custom-elements/#concepts)을 적용하지 않습니다 (모두 소문자이어야 하고 하이픈을 포함해야합니다). 그러나 이 규칙을 따르는 것이 좋습니다.</p>
+
+      <p>일단 등록되면, 컴포넌트는 인스턴스의 템플릿에서 커스텀 엘리먼트, < my-component >< /my-component >로 사용할 수 있습니다.
+      <p>루트 Vue 인스턴스를 인스턴스화하기 전에 컴포넌트가 등록되어 있는지 확인하십시오. 전체 예제는 다음과 같습니다.</p>
+
+      <pre>
+        <code>
+          // 사용
+          < div id="example">
+            < my-component>< /my-component>
+          < /div>
+
+          // 등록
+          Vue.component('my-component', {
+            template: '< div>사용자 정의 컴포넌트 입니다!< /div>'
+          })
+
+          // 루트 인스턴스 생성
+          new Vue({
+            el: '#example'
+          })
+
+          //아래와 같이 렌더링 됩니다.
+
+          < div id="example">
+            < div>사용자 정의 컴포넌트 입니다!< /div>
+          < /div>
+        </code>
+      </pre>
+
+      <div id="example">
+        <global-component></global-component>
+      </div>
+      <script>
+        Vue.component('global-component', {
+          template: `<div>사용자 정의 전역 컴포넌트 입니다!</div>`
+        })
+        new Vue({
+          el: '#example'
+        })
+      </script>
+    </div>
+
+    <div>
+      <h3>지역 등록</h3>
+      <p>모든 컴포넌트를 전역으로 등록 할 필요는 없습니다</p>
+      <p>컴포넌트를 components 인스턴스 옵션으로 등록함으로써 다른 인스턴스/컴포넌트의 범위에서만 사용할 수있는 컴포넌트를 만들 수 있습니다</p>
+
+      <pre>
+        <code>
+          var Child = {
+            template: '< div>사용자 정의 컴포넌트 입니다!< /div>'
+          }
+
+          new Vue({
+            // ...
+            components: {
+              // < my-component > 는 상위 템플릿에서만 사용할 수 있습니다.
+              'my-component': Child
+            }
+          })
+        </code>
+      </pre>
+
+      <p>동일한 캡슐화는 디렉티브와 같은 다른 등록 가능한 Vue 기능에도 적용</p>
+
+      <div id="example-2">
+        <global-component></global-component>
+        <local-component></local-component>
+      </div>
+      <script>
+        var Child = {
+          template: `<div>사용자 정의 지역 컴포넌트 입니다!</div>`
+        }
+
+        new Vue({
+          el: '#example-2',
+          components: {
+            'local-component': Child
+          }
+        })
+      </script>
+    </div>
+
+    <div>
+      <h2>DOM 템플릿 구문 분석 경고</h2>
+      <p>DOM을 템플릿으로 사용할 때 (예 : el 옵션을 사용하여 기존 콘텐츠가 있는 엘리먼트를 마운트하는 경우)</p>
+      <p>Vue는 템플릿 콘텐츠만 가져올 수 있기 때문에 HTML이 작동하는 방식에 고유한 몇 가지 제한 사항이 적용됩니다.</p>
+      <p>이는 브라우저가 구문 분석과 정규화한 후에 작동합니다.</p>
+      <p>가장 중요한 것은< ul>,< ol>,< table>과< select>와 같은 일부 엘리먼트는 그 안에 어떤 엘리먼트가 나타날 수 있는지에 대한 제한</p>
+      <p>< option>과 같이 특정 다른 엘리먼트 안에만 나타날 수 있습니다.</p>
+
+      <pre>
+        <code>
+          < table>
+            < my-row>...< /my-row>
+          < /table>
+        </code>
+      </pre>
+      <p>이러한 제한이 있는 엘리먼트가 있는 사용자 지정 컴포넌트를 사용하면 다음과 같은 문제가 발생할 수 있습니다.</p>
+
+      <p>사용자 지정 컴포넌트 < my-row> 는 잘못 된 컨텐츠가 되어, 결과적으로 렌더링시 에러를 발생시킵니다.</p>
+      <p>해결 방법은 is 특수 속성을 사용하는 것입니다 :</p>
+      <pre>
+        <code>
+          < table>
+            < tr is="my-row">< /tr>
+          < /table>
+        </code>
+      </pre>
+
+      <div id="example-3">
+        <table>
+          <tr is="my-row"></tr>
+        </table>
+      </div>
+      <script>
+        var myRow = {
+          template: '<span>my-row</span>'
+        }
+
+        new Vue({
+          el: '#example-3',
+          components: {
+            'my-row': myRow
+          }
+        })
+      </script>
+    </div>
+
+    <div>
+      <h2>data 는 반드시 함수여야합니다.</h2>
+      <p>Vue 생성자에 사용할 수 있는 대부분의 옵션은 컴포넌트에서 사용할 수 있습니다.</p>
+      <p>한가지 특별한 경우가 있습니다. data 는 함수여야 합니다. 실제로 이를 사용하는 경우에:</p>
+      <pre>
+        <code>
+          Vue.component('my-component', {
+            template: '< span>{{ message }}< /span>',
+            data: {
+              message: 'hello'
+            }
+          })
+        </code>
+      </pre>
+      <p>그런 다음 Vue는 중단하고 콘솔에서 경고를 합니다.</p>
+      <p>data는 컴포넌트 인스턴스의 함수여야합니다.</p>
+      <p>규칙이 존재하는 이유를 이해하는 것이 좋습니다. 따라서 다음과 같이 사용하십시오.</p>
+
+      <div id="example-4">
+        <simple-counter></simple-counter>
+        <simple-counter></simple-counter>
+        <simple-counter></simple-counter>
+      </div>
+
+      <script>
+        var data = { counter: 0 }
+
+        Vue.component('simple-counter', {
+          template: `<button v-on:click="counter += 1">{{ counter }}</button>`,
+          // 데이터는 기술적으로 함수이므로 Vue는 따지지 않지만
+          // 각 컴포넌트 인스턴스에 대해 같은 객체 참조를 반환합니다.
+          data: function () {
+            return data
+          }
+        })
+
+        new Vue({
+          el: '#example-4'
+        })
+      </script>
+
+      <p>이런! 세 개의 컴포넌트 인스턴스가 모두 같은 data 객체를 공유하므로 하나의 카운터를 증가 시키면 모두 증가합니다!</p>
+      <p>대신 새로운 데이터 객체를 반환하여 이 문제를 해결합시다.</p>
+
+      <div id="example-5">
+        <simple-counter-2></simple-counter-2>
+        <simple-counter-2></simple-counter-2>
+        <simple-counter-2></simple-counter-2>
+      </div>
+
+      <script>
+        Vue.component('simple-counter-2', {
+          template: `<button v-on:click="counter += 1">{{ counter }}</button>`,
+          // 데이터는 기술적으로 함수이므로 Vue는 따지지 않지만
+          // 각 컴포넌트 인스턴스에 대해 같은 객체 참조를 반환합니다.
+          data: function () {
+            return {
+              counter: 0
+            }
+          }
+        })
+
+        new Vue({
+          el: '#example-5'
+        })
+      </script>
+    </div>
+
+    <div>
+      <h2>컴포넌트 작성</h2>
+      <p>컴포넌트는 부모-자식 관계에서 가장 일반적으로 함께 사용하기 위한 것</p>
+      <p>컴포넌트 A는 자체 템플릿에서 컴포넌트 B를 사용할 수 있습니다. </p>
+      <p>필연적으로 서로 의사 소통이 필요</p>
+      <p>부모는 자식에게 데이터를 전달해야 할 수도 있으며, 자식은 자신에게 일어난 일을 부모에게 알릴 필요가 있습니다.</p>
+      <p>그러나 부모와 자식이 명확하게 정의된 인터페이스를 통해 가능한한 분리된 상태로 유지하는 것도 매우 중요</p>
+      <p>이렇게하면 각 컴포넌트의 코드를 상대적으로 격리 할 수 있도록 작성하고 추론할 수 있으므로 유지 관리가 쉽고 잠재적으로 쉽게 재사용 할 수 있습니다.</p>
+      <p>Vue.js에서 부모-자식 컴포넌트 관계는</p>
+      <p>props는 아래로, 부모는 props를 통해 자식에게 데이터를 전달</p>
+      <p>events 위로, 자식은 events를 통해 부모에게 메시지를 전달</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>
