@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <title>Title</title>
+</head>
+<body>
+<div>
+  <h1>이벤트 핸들링</h1>
+
+  <div>
+    <h3>이벤트 청취</h3>
+    <p>v-on 디렉티브를 사용하여 DOM 이벤트를 듣고 트리거 될 때 JavaScript를 실행할 수 있습니다.</p>
+
+    <p>v-on:click="counter += 1"</p>
+    <div id="example-1">
+      <button v-on:click="counter += 1">Add 1</button>
+      <p>위 버튼을 클릭한 횟수는 {{ counter }} 번 입니다.</p>
+    </div>
+    <script>
+      var example1 = new Vue({
+        el: '#example-1',
+        data: {
+          counter: 0
+        }
+      })
+    </script>
+  </div>
+
+  <div>
+    <h2>메소드 이벤트 핸들러</h2>
+    <p>많은 이벤트 핸들러의 로직은 더 복잡할 것이므로</p>
+    <p>JavaScript를 v-on 속성 값으로 보관하는 것은 간단하지 않습니다.</p>
+    <p>이 때문에 v-on이 호출하고자 하는 메소드의 이름을 받는 이유입니다.</p>
+
+    <p>v-on:click="reverseMessage"</p>
+    <div id="example-2">
+      <p>{{ message }}</p>
+      <button v-on:click="reverseMessage">메시지 뒤집기</button>
+
+      <p/>
+      v-on 디렉티브를 사용하여 Vue 인스턴스에서 메소드를 호출하는 이벤트 리스너를 추가할 수 있음
+    </div>
+    <script>
+      var app = new Vue({
+        el: '#example-2',
+        data: {
+          message: '안녕하세요! Vue.js!'
+        },
+        methods: {
+          reverseMessage: function (event) {
+            //메소드 안에서 사용하는 `this` 는 Vue 인스턴스를 가리킵니다.
+            this.message = this.message.split('').reverse().join('')
+
+            //`event` 는 네이티브 DOM 이벤트 입니다.
+            if(event) {
+              alert(event.target.tagName);
+            }
+          }
+        }
+      })
+    </script>
+  </div>
+
+  <div>
+    <h2>인라인 메소드 핸들러</h2>
+    <p>메소드 이름을 직접 바인딩 하는 대신 인라인 JavaScript 구문에 메소드를 사용할 수도 있습니다.</p>
+
+    <p>v-on:click="say('hi')"</p>
+    <p>v-on:click="say('what')"</p>
+
+    <div id="example-3">
+      <button v-on:click="say('hi')">Say hi</button>
+      <button v-on:click="say('what')">Say what</button>
+    </div>
+    <script>
+      new Vue({
+        el: '#example-3',
+        methods: {
+          say: function (message) {
+            alert(message)
+          }
+        }
+      })
+    </script>
+
+    <p>때로 인라인 명령문 핸들러에서 원본 DOM 이벤트에 액세스 해야할 수도 있습니다.</p>
+    <p>특별한 $event 변수를 사용해 메소드에 전달할 수도 있습니다.</p>
+
+    <p>button v-on:click="warn('Form cannot be submitted yet.', $event)"</p>
+    <pre>
+      <code>
+        methods: {
+          warn: function (message, event) {
+            // 이제 네이티브 이벤트에 액세스 할 수 있습니다
+            if (event) event.preventDefault()
+            alert(message)
+          }
+        }
+      </code>
+    </pre>
+  </div>
+
+  <div>
+    <h2>이벤트 수식어</h2>
+    <p>이벤트 핸들러 내부에서 event.preventDefault() 또는 event.stopPropagation()를 호출하는 것은 매우 보편적인 일</p>
+    <p>메소드 내에서 쉽게 이 작업을 할 수 있지만, DOM 이벤트 세부 사항을 처리하는 대신 데이터 로직에 대한 메소드만 사용할 수 있으면 더 좋을 것입니다.</p>
+
+    <p>이 문제를 해결하기 위해, Vue는 v-on 이벤트에 이벤트 수식어를 제공합니다. 수식어는 점으로 표시된 접미사 입니다.</p>
+    <ul>
+      <li>.stop</li>
+      <li>.prevent</li>
+      <li>.capture</li>
+      <li>.self</li>
+      <li>.once</li>
+      <li>.passive</li>
+    </ul>
+
+    <p>클릭 이벤트 전파가 중단됩니다</p>
+    <p>a v-on:click.stop="doThis"</p>
+    <div id="v-on-click-stop">
+      <div v-on:click="doThis('div')">
+        <!-- 상위 엘리먼트로의 클릭 이벤트 전파가 중단 .stop을 빼면 상위 엘리먼트 클릭 이벤트 작동 -->
+        <button v-on:click.stop="doThis('button')">doThis!</button>
+      </div>
+    </div>
+    <script>
+      new Vue({
+        el: '#v-on-click-stop',
+        methods: {
+          doThis: function(message) {
+            alert(message);
+          }
+        }
+      })
+    </script>
+
+    <p></p>
+    <p>제출 이벤트가 페이지를 다시 로드 하지 않습니다</p>
+    <p>form v-on:submit.prevent="onSubmit"</p>
+    <div id="v-on-submit-prevent">
+      <form v-on:submit.prevent="onSubmit">
+        <button>onSubmit</button>
+      </form>
+    </div>
+    <script>
+      new Vue({
+        el: '#v-on-submit-prevent'
+      })
+    </script>
+
+    <p></p>
+    <p>수식어는 체이닝 가능합니다</p>
+    <p>a v-on:click.stop.prevent="doThat"</p>
+    <p></p>
+    <p>단순히 수식어만 사용할 수 있습니다</p>
+    <p>form v-on:submit.prevent</p>
+    <p></p>
+    <p>이벤트 리스너를 추가할 때 캡처모드를 사용합니다</p>
+    <p>즉, 내부 엘리먼트를 대상으로 하는 이벤트가 해당 엘리먼트에서 처리되기 전에 여기서 처리합니다.</p>
+    <p>div v-on:click.capture="doThis"</p>
+    <p></p>
+    <p>event.target이 엘리먼트 자체인 경우에만 트리거를 처리합니다</p>
+    <p>자식 엘리먼트에서는 안됩니다</p>
+    <p>div v-on:click.self="doThat"</p>
+
+    <p>클릭 이벤트는 최대 한번만 트리거 됩니다.</p>
+    <p>v-on:click.once="doThis"</p>
+    <p>네이티브 DOM 이벤트에 독점적인 다른 수식어와 달리, .once 수식어는 컴포넌트 이벤트에서도 사용할 수 있습니다</p>
+
+    <p>Vue는 addEventListener의 passive option에 해당하는 .passive 수식어 또한 제공</p>
+    <p>스크롤의 기본 이벤트를 취소할 수 없습니다</p>
+    <p>v-on:scroll.passive="onScroll"</p>
+  </div>
+
+  <div>
+    <h2>키 수식어</h2>
+    <p>키보드 이벤트를 청취할 때, 종종 공통 키 코드를 확인해야 합니다. Vue는 키 이벤트를 수신할 때 v-on에 대한 키 수식어를 추가할 수 있습니다.</p>
+    <p>only call `vm.submit()` when the `key` is `Enter`</p>
+    <p>input v-on:keyup.enter="submit"</p>
+    <div id="v-on-keyup-enter">
+      <input v-on:keyup.enter="onEnter">커서 두고 엔터를 누르면 카운트 증가 -> {{ count }}
+    </div>
+    <script>
+      new Vue({
+        el: '#v-on-keyup-enter',
+        data: {
+          count: 0
+        },
+        methods: {
+          onEnter: function() {
+            this.count++
+          }
+        }
+      })
+    </script>
+    <p>KeyboardEvent.key를 통해 노출된 유효 키 이름을 케밥 케이스로 변환하여 수식어로 사용할 수 있습니다.</p>
+    <p>input v-on:keyup.page-down="onPageDown"</p>
+    <p>위의 예제에서 핸들러는 $event.key === 'PageDown' 일 때에만 호출됩니다</p>
+  </div>
+
+</div>
+</body>
+</html>
