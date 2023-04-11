@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <title>Title</title>
+</head>
+<body>
+<div>
+  <h1>Props</h1>
+  <div>
+    <h2>Prop 대소문자 구분 (camelCase vs kebab-case)</h2>
+    <pre>
+      <code>
+        Vue.component('blog-post', {
+          // JavaScript에서의 camelCase
+          props: ['postTitle'],
+          template: '< h3>{{ postTitle }}< /h3>'
+        })
+
+        <!-- HTML에서의 kebab-case -->
+        < blog-post post-title="hello!">< /blog-post>
+
+        문자열 템플릿을 사용하는 경우에는 무관합니다.
+      </code>
+    </pre>
+  </div>
+
+  <div>
+    <h2>Prop 타입</h2>
+    <p>이때까지 우리는 문자열 배열 형태로 작성된 prop의 리스트를 보아 왔습니다.</p>
+    <p>props: ['title', 'likes', 'isPublished', 'commentIds', 'author']</p>
+    <p>일반적으로 생각해 보면, prop에 특정 타입의 값을 넣고싶은 경우가 있을 수 있습니다. </p>
+    <p>이 때, 다음과 같이 prop을 속성 이름과 타입을 포함하는 오브젝트로 선언함으로써 타입이 지정된 prop의 리스트를 구현할 수 있습니다.</p>
+    <pre>
+      <code>
+        props: {
+          title: String,
+          likes: Number,
+          isPublished: Boolean,
+          commentIds: Array,
+          author: Object,
+          callback: Function,
+          contactsPromise: Promise // or any other constructor
+        }
+      </code>
+    </pre>
+    <p>이는 컴포넌트를 읽기 좋게 문서화할 뿐 아니라 브라우저의 자바스크립트 콘솔에서도 잘못된 타입이 전달된 경우 경고를 띄워줄 수 있도록 해줍니다</p>
+  </div>
+
+  <div>
+    <h2>정적 & 동적 prop 전달하기</h2>
+    <p>아래와 같이 정적인 prop을 전달할 수 있습니다.</p>
+    <pre>
+      <code>
+        < blog-post title="My journey with Vue">< /blog-post>
+
+        혹은 아래와 같이 v-bind 를 이용하여 동적인 prop을 전달할 수도 있습니다.
+
+        <!-- 변수에 담긴 값을 동적으로 할당 -->
+        < blog-post v-bind:title="post.title">< /blog-post>
+
+        <!-- 복잡한 표현식의 값을 동적으로 할당 -->
+        < blog-post
+            v-bind:title="post.title + ' by ' + post.author.name"
+        >< /blog-post>
+
+        위 두 가지 경우는 모두 문자열 형태의 변수를 전달하지만 실제로는 모든 타입의 변수가 prop으로 전달될 수 있습니다.
+      </code>
+    </pre>
+    <div id="example-1">
+      <blog-post :title="message"></blog-post>
+    </div>
+    <script>
+      new Vue({
+        el: '#example-1',
+        data: {
+          message: 'title message'
+        },
+        components: {
+          'blog-post': {
+            props: ['title'],
+            template: `<span>{{ title }} is {{ typeof title }}</span>`,
+          }
+        }
+      })
+    </script>
+  </div>
+
+  <div>
+    <h2>숫자형(Number) 전달</h2>
+    <div>
+      <pre>
+        <code>
+          <!-- `42`는 정적인 값이지만, Vue에서 해당 값이 숫자라는 것을 알 수 있도록 하기 위해 -->
+          <!-- v-bind를 이용해 문자열이 아닌 JavaScript 표현식이라는 것을 알려줍니다.      -->
+          < blog-post v-bind:likes="42">< /blog-post>
+
+          <!-- 변수의 값을 동적으로 할당할 수도 있습니다. -->
+          < blog-post v-bind:likes="post.likes">< /blog-post>
+        </code>
+      </pre>
+
+      <div id="example-2">
+        <blog-post :likes="number"></blog-post>
+      </div>
+      <script>
+        new Vue({
+          el: '#example-2',
+          data: {
+            number: 42
+          },
+          components: {
+            'blog-post': {
+              props: ['likes'],
+              template: `<span>{{ likes }} is {{ typeof likes }}</span>`,
+            }
+          }
+        })
+      </script>
+    </div>
+  </div>
+
+  <div>
+    <h2>논리 자료형(Boolean) 전달</h2>
+    <div>
+      <pre>
+        <code>
+          <!-- 값이 없는 prop은 `true` 를 전달합니다.. -->
+          < blog-post is-published>< /blog-post>
+
+          <!-- `false`는 정적인 값이지만, Vue에서 해당 값이 논리 자료형이라는 것을 알 수 있도록 하기 위해 -->
+          <!-- v-bind를 이용해 문자열이 아닌 JavaScript 표현식이라는 것을 알려줍니다.                -->
+          < blog-post v-bind:is-published="false">< /blog-post>
+
+          <!-- 변수의 값을 동적으로 할당할 수도 있습니다. -->
+          < blog-post v-bind:is-published="post.isPublished">< /blog-post>
+        </code>
+      </pre>
+      <div id="example-3">
+        <blog-post :is-published="isPublished"></blog-post>
+      </div>
+      <script>
+        new Vue({
+          el: '#example-3',
+          data: {
+            isPublished: true
+          },
+          components: {
+            'blog-post': {
+              props: ['isPublished'],
+              template: `<span>{{ isPublished }} is {{ typeof isPublished }}</span>`,
+            }
+          }
+        })
+      </script>
+    </div>
+  </div>
+
+  <div>
+    <h2>배열(Array) 전달</h2>
+    <div>
+      <pre>
+        <code>
+          <!-- 해당 배열은 정적인 값이지만, Vue에서 해당 값이 배열이라는 것을 알 수 있도록 하기 위해 -->
+          <!-- v-bind를 이용해 문자열이 아닌 JavaScript 표현식이라는 것을 알려줍니다.          -->
+          < blog-post v-bind:comment-ids="[234, 266, 273]">< /blog-post>
+
+                    <!-- 변수의 값을 동적으로 할당할 수도 있습니다. -->
+          < blog-post v-bind:comment-ids="post.commentIds">< /blog-post>
+        </code>
+      </pre>
+      <div id="example-4">
+        <blog-post :comment-ids="commentIds"></blog-post>
+      </div>
+      <script>
+        new Vue({
+          el: '#example-4',
+          data: {
+            commentIds: [1, 2, 3, 4]
+          },
+          components: {
+            'blog-post': {
+              props: ['commentIds'],
+              template: `<span>{{ commentIds }} Array.isArray {{ Array.isArray(commentIds) }}</span>`,
+            }
+          }
+        })
+      </script>
+    </div>
+  </div>
+
+  <div>
+    <h2>오브젝트(Object) 전달</h2>
+    <div>
+      <pre>
+        <code>
+          <!-- 해당 오브젝트는 정적인 값이지만, Vue에서 해당 값이 배열이라는 것을 알 수 있도록 하기 위해 -->
+          <!-- v-bind를 이용해 문자열이 아닌 JavaScript 표현식이라는 것을 알려줍니다.             -->
+          < blog-post
+              v-bind:author="{
+              name: 'Veronica',
+              company: 'Veridian Dynamics'
+            }"
+          >< /blog-post>
+
+          <!-- 변수의 값을 동적으로 할당할 수도 있습니다. -->
+          < blog-post v-bind:author="post.author">< /blog-post>
+        </code>
+      </pre>
+      <div id="example-5">
+        <blog-post :author="author"></blog-post>
+      </div>
+      <script>
+        new Vue({
+          el: '#example-5',
+          data: {
+            author: {
+              name: 'Veronica',
+              company: 'Veridian Dynamics'
+            }
+          },
+          components: {
+            'blog-post': {
+              props: ['author'],
+              template: `<div>
+                <span>{{ author }} is {{ typeof author }}</span><br/>
+                <span>name : {{ author.name }}</span><br/>
+                <span>company : {{ author.company }}</span>
+              </div>`,
+            }
+          }
+        })
+      </script>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
