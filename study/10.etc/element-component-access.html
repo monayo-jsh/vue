@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <title>Title</title>
+</head>
+<body>
+<div>
+  <h1>예외적인 상황들</h1>
+
+  <div>
+    <h2>엘리먼트 & 컴포넌트 접근</h2>
+    <p>대부분의 경우, 다른 컴포넌트에 접근하거나 직접 DOM 엘리먼트에 접근하는 것을 피하는 것이 좋습니다.</p>
+    <p>그럼에도 불구하고, 이러한 접근이 허용되는 경우가 있습니다.</p>
+
+    <div>
+      <h3>루트 엘리먼트에 접근하기</h3>
+      <p>new Vue 의 모든 하위 컴포넌트에서는 $root 속성을 이용해 루트 인스턴스에 접근할 수 있습니다.</p>
+      <p>예를 들어, 아래와 같은 루트 인스턴스가 있다면</p>
+
+      <pre>
+        <code>
+          // 루트 Vue 인스턴스
+          new Vue({
+            data: {
+              foo: 1
+            },
+            computed: {
+              bar: function () { /* ... */ }
+            },
+            methods: {
+              baz: function () { /* ... */ }
+            }
+          })
+
+          모든 하위 컴포넌트에서 아래와 같이 접근할 수 있으며, 전역 저장소처럼 활용할 수 있습니다.
+
+          // root의 데이터 가져오기
+          this.$root.foo
+
+          // root의 데이터 수정하기
+          this.$root.foo = 2
+
+          // root의 computed 속성 접근하기
+          this.$root.bar
+
+          // root의 method 사용하기
+          this.$root.baz()
+
+          상태 관리를 위해 Vuex 를 사용하는 것을 강력히 권장합니다..
+        </code>
+      </pre>
+    </div>
+
+    <div>
+      <h3>부모 컴포넌트 인스턴스에 접근하기</h3>
+      <p>$root와 비슷하게, $parent 속성을 사용하여 자식 요소에서 부모 인스턴스에 접근할 수 있습니다.</p>
+      <p>이는 prop을 이용해 데이터를 넘겨주는 것의 (조금 뒤떨어지는) 대안으로써 사용할 수 있습니다.</p>
+      <p>하지만 가끔, 부분적으로 컴포넌트간의 공유가 이루어져야 하는 라이브러리가 존재합니다.</p>
+      <p>예를 들어, HTML을 렌더링하는 대신 JavaScript API와 통신하는 Google Maps 컴포넌트 같은 경우를 예로 들 수 있습니다:</p>
+      <pre>
+        <code>
+          < google-map>
+            < google-map-markers v-bind:places="iceCreamShops">< /google-map-markers>
+          < /google-map>
+
+          이 < google-map> 컴포넌트는 모든 하위 컴포넌트가 접근할 수 있어야 하는 map 속성을 가져야 합니다.
+          위의 경우, < google-map-marker>가 this.$parent.getMap과 같은 방식으로 map에 접근할 수 있어야 정상적으로 마커를 추가할 수 있을 것입니다.
+
+
+          본질적으로 위와 같은 패턴은 여전히 취약하다는 것을 기억하세요.
+          예를 들어, < google-map-region> 컴포넌트를 추가하고 < google-map-markers> 컴포넌트가 그 지역 안에서만 마커를 렌더링 할 수도 있도록 구조를 변경한다고 가정해 봅시다.
+
+          < google-map>
+            < google-map-region v-bind:shape="cityBoundaries">
+              < google-map-markers v-bind:places="iceCreamShops">< /google-map-markers>
+            < /google-map-region>
+          < /google-map>
+
+          var map = this.$parent.map || this.$parent.$parent.map
+
+          이러한 패턴은 금세 더 이상 손댈 수 없게 변하게 됩니다.
+          이러한 이유로, 임의의 깊이를 가진 하위 요소에게 컨텍스트 정보를 제공하기 위한 방법으로써 위 패턴 대신에 의존성 주입을 사용하는 것이 권장됩니다.
+        </code>
+      </pre>
+    </div>
+
+    <div>
+      <h3>자식 컴포넌트의 인스턴스 및 요소에 접근하기</h3>
+      <p>물론 props와 events가 존재하지만,</p>
+      <p>가끔 JavaScript에서 자식 요소에 직접 접근해야 하는 경우가 있습니다.</p>
+      <p>이 경우, ref 속성을 이용해 자식 요소에 레퍼런스 ID를 할당하여 해결할 수 있습니다.</p>
+      <pre>
+        <code>
+          < base-input ref="usernameInput">< /base-input>
+
+          이제 ref를 이용해 ID를 정의한 컴포넌트 안에서 아래와 같이 작성하면:
+
+          this.$refs.usernameInput
+
+          < base-input> 인스턴스에 접근할 수 있습니다.
+          이러한 방식은 필요에 따라서 유용할 수 있습니다.
+          예를 들어, 프로그래밍적으로 부모요소에서 자식 요소 내부의 input 요소에 focus를 부여하고 싶은 경우를 생각해 봅시다.
+          이 경우 < base-input> 컴포넌트에서도 ref를 사용함으로써 특정 요소에 접근할 수 있습니다.
+
+          예를 들어 < base-input> 내에
+
+          < input ref="input">
+
+          와 같이 작성되어 있고 부모요소에서 아래와 같은 메소드를 작성함으로써:
+
+          methods: {
+            // Used to focus the input from the parent
+            focus: function () {
+              this.$refs.input.focus()
+            }
+          }
+
+          부모요소에서 < base-input> 내부의 input에 focus되도록 하기 위해 아래와 같이 작성할 수 있습니다.
+
+          this.$refs.usernameInput.focus()
+
+          ref 를 v-for 와 함께 사용하는 경우에는 ref는 데이터 소스를 미러링하는 자식 컴포넌트를 포함하는 배열을 얻게 됩니다.
+
+          $refs 는 컴포넌트가 렌더링 된 후에 접근할 수 있으며, 반응형이 아닙니다.
+          즉, 직접적인 자식 요소 제어에만 유효합니다 - $refs를 template나 computed 속성 안에 포함시키지 않는 것이 좋습니다.
+        </code>
+      </pre>
+
+      <div id="example-3">
+        <base-input ref="usernameInput"></base-input>
+      </div>
+      <script>
+        Vue.component('base-input', {
+          template: `<input type="text" name="username">`
+        })
+
+        var example3 = new Vue({
+          el: '#example-3',
+          methods: {
+            focus: function() {
+              this.$refs.usernameInput.focus();
+            }
+          }
+        })
+      </script>
+    </div>
+
+    <div>
+      <h3>의존성 주입</h3>
+      <p>provide 와 inject 두 개의 옵션을 사용하는 의존성 주입을 유용하게 사용할 수 있습니다.</p>
+
+      <pre>
+        <code>
+          provide 옵션은 모든 하위 자식들에게 제공하고자 하는 data 및 methods를 특정할 수 있게 해 줍니다.
+          이 경우에는 < google-map> 안의 getMap 메소드가 제공하고자 하는 메소드입니다.
+
+          provide: function () {
+            return {
+              getMap: this.getMap
+            }
+          }
+
+          이제 모든 하위 자식들에서 inject 옵션을 이용해 특정 속성을 받아 추가할 수 있도록 할 수 있습니다:
+
+          inject: ['getMap']
+
+          $parent 를 사용하는 것에 비해서 얻을 수 있는 이점은 이제 모든 하위 자식에서
+          < google-map> 의 모든 요소에 접근하지 않고도 getMap 메소드에 접근할 수 있다는 것입니다.
+
+          이는 컴포넌트를 개발할 때 자식 요소가 의존성을 갖는 바꾸거나 제거할 수도 있다는 두려움 없이 안전하게 개발할 수 있도록 해 줍니다.
+          컴포넌트들 사이의 인터페이스는 props 로써 명료하게 정의되어 있게 됩니다.
+
+          예제는 다음과 같습니다.
+
+          < div id="app">
+            < google-map>
+                < google-map-markers v-bind:places="iceCreamShops">< /google-map-markers>
+            < /google-map>
+          < /div>
+
+          Vue.component('google-map', {
+            provide: function () {
+              return {
+                getMap: this.getMap
+              }
+            },
+            data: function () {
+              return {
+                map: null
+              }
+            },
+            mounted: function () {
+              this.map = new google.maps.Map(this.$el, {
+                center: { lat: 0, lng: 0 },
+                zoom: 1
+              })
+            },
+            methods: {
+              getMap: function (found) {
+                var vm = this
+                function checkForMap () {
+                  if (vm.map) {
+                    found(vm.map)
+                  } else {
+                    setTimeout(checkForMap, 50)
+                  }
+                }
+                checkForMap()
+              }
+            },
+            template: '< div class="map">< slot>< /slot>< /div>'
+          })
+
+          Vue.component('google-map-marker', {
+            inject: ['getMap'],
+            props: ['places'],
+            created: function () {
+              var vm = this
+              vm.getMap(function (map) {
+                vm.places.forEach(function (place) {
+                  new google.maps.Marker({
+                    position: place.position,
+                    map: map
+                  })
+                })
+              })
+            },
+            render (h) {
+              return null
+            }
+          })
+
+          new Vue({
+            el: '#app',
+            data: {
+              vueConfCities: [
+                {
+                  name: 'Wrocław',
+                  position: {
+                    lat: 51.107885,
+                    lng: 17.038538
+                  }
+                },
+                {
+                  name: 'New Orleans',
+                  position: {
+                    lat: 29.951066,
+                    lng: -90.071532
+                  }
+                }
+              ]
+            }
+          })
+        </code>
+      </pre>
+    </div>
+  </div>
+</div>
+</body>
+</html>

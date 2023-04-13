@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <title>Title</title>
+</head>
+<body>
+<div>
+  <h1>동적 & 비동기 컴포넌트</h1>
+
+  <div>
+    <h2>keep-alive</h2>
+    <p>동적 컴포넌트를 재생성하는 것은 보통은 유용한 동작입니다. 하지만 이 경우에는, 탭 컴포넌트 인스턴스가 처음 생성될 때 캐시 되는 것을 선호합니다. 이런 문제를 해결하기 위해서, 동적 컴포넌트를 < keep-alive> 엘리먼트로 둘러쌀 수 있습니다.</p>
+  </div>
+
+  <div>
+    <h2>비동기 컴포넌트</h2>
+    <div>
+      <pre>
+        <code>
+          Vue.component("async-example", function(resolve, reject) {
+            setTimeout(function() {
+              // 컴포넌트 정의를 resolve 콜백을 통해 전달
+              resolve({
+                template: "< div>I am async!< /div>"
+              });
+            }, 1000);
+          });
+
+          팩토리 함수는 resolve 콜백을 받습니다.
+          콜백은 서버에 컴포넌트의 정의를 요청했을 때 호출됩니다.
+          reject(reason) 을 호출하여 로딩이 실패한 경우에 대응할 수도 있습니다.
+          setTimeout은 예제일 뿐이며, 컴포넌트를 어떻게 받아올지는 원하는 방식을 선택하면 됩니다.
+          권장되는 접근 방식으로써, Webpack’s code-splitting feature 와 함께 비동기 컴포넌트를 사용하는 패턴이 있습니다
+
+          Vue.component("async-webpack-example", function(resolve) {
+            // 아래의 특별한 'require' 문법은
+            // 웹팩이 Ajax를 통해 로드한 번들들을 이용해
+            // 코드를 자동으로 분할하도록 합니다.
+            require(["./my-async-component"], resolve);
+          });
+
+          팩토리 함수 안에서 Promise를 반환할 수도 있습니다.
+          Webpack 2와 ES2015 문법을 이용해 아래와 같이 쓸 수 있습니다
+
+          Vue.component(
+            "async-webpack-example",
+            // `import` 함수는 Promise를 반환합니다.
+            () => import("./my-async-component")
+          );
+
+          local registration을 이용하면, Promise를 반환하는 함수를 직접 작성할 수도 있습니다:
+
+          new Vue({
+            // ...
+            components: {
+              "my-component": () => import("./my-async-component")
+            }
+          });
+        </code>
+      </pre>
+    </div>
+
+    <div>
+      <h2>Handling Loading State</h2>
+      <div>
+        비동기 컴포넌트 팩토리는 아래와 같은 포맷으로 오브젝트를 반환할 수도 있습니다
+        <pre>
+          <code>
+            const AsyncComponent = () => ({
+              // 로드 할 컴포넌트(Promise여야 합니다.)
+              component: import("./MyComponent.vue"),
+              // 비동기 컴포넌트가 로딩중일 때 사용할 컴포넌트
+              loading: LoadingComponent,
+              // 비동기 컴포넌트 로딩이 실패했을 때 사용할 컴포넌트
+              error: ErrorComponent,
+              // 로딩 컴포넌트를 보여주기 전의 지연시간. (기본값: 200ms)
+              delay: 200,
+              // 초과되었을 때 에러 컴포넌트를 표시할 타임아웃. (기본값: 무한대)
+              timeout: 3000
+            });
+          </code>
+        </pre>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
