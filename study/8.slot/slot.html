@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <title>Title</title>
+</head>
+<body>
+<div>
+  <h1>슬롯(Slots)</h1>
+
+  <div>
+    <h2>슬롯에 들어가는 내용(Slot Content)</h2>
+
+    <pre>
+      <code>
+        < navigation-link url="/profile">
+          Your Profile
+        < /navigation-link>
+
+        < navigation-link> 템플릿을 아래와 같이 만들 수 있습니다.
+
+        < a
+            v-bind:href="url"
+            class="nav-link"
+        >
+          < slot>< /slot>
+        < /a>
+
+        컴포넌트를 렌더링할 때 < slot>< /slot>이 “Your Profile”로 교체됩니다.
+        슬롯에는 HTML 같은 템플릿 코드를 포함시킬 수 있기 때문입니다.
+
+        < navigation-link url="/profile">
+          <!-- Font Awesome 아이콘을 추가합시다 -->
+          < span class="fa fa-user">< /span>
+          Your Profile
+        < /navigation-link>
+      </code>
+    </pre>
+
+    <div id="example-1">
+      <navigation-link :url="profileUrl">
+        <font-awesome-icon :name="iconName"></font-awesome-icon>
+        Your Profile 내용이 slot 태그로 대체되어 표기됨
+      </navigation-link>
+    </div>
+    <script>
+      Vue.component('font-awesome-icon', {
+        props: ["name"],
+        computed: {
+          convIconClass: function () {
+            return 'fa-' + this.name;
+          }
+        },
+        template: `<span class="fa" :class="convIconClass"></span>`
+      })
+
+      Vue.component('navigation-link', {
+        props: ["url"],
+        template: `
+          <a
+            :href="url"
+            class="nav-link"
+          >
+            <slot></slot>
+          </a>
+        `
+      })
+
+      new Vue({
+        el: '#example-1',
+        data: {
+          profileUrl: "https://naver.com",
+          iconName: "user"
+        }
+      })
+    </script>
+  </div>
+
+  <div>
+    <h2>기본값 지정(Fallback Content)</h2>
+
+    <p>아무 컨텐트도 전달되지 않았을 때 슬롯에 렌더링시킬 대비책(즉 기본값)을 지정해놓는 것이 유용한 경우가 있을 수 있습니다.</p>
+    <p>< submit-button> 컴포넌트의 예를 살펴봅시다.</p>
+
+    <pre>
+      <code>
+        < button type="submit">
+          < slot>< /slot>
+        < /button>
+
+        보통은 < button> 안에 “Submit” 텍스트가 들어가기를 원할 때가 많습니다.
+        “Submit”을 기본값으로 만들기 위해서는 < slot> 태그 사이에 넣어야 합니다.
+
+        < button type="submit">
+          < slot>Submit< /slot>
+        < /button>
+
+        이제 부모 컴포넌트의 < submit-button>를 사용할 때 아래와 같이 슬롯에 해당하는 아무 내용을 전달하지 않으면
+        < submit-button>< /submit-button>
+
+        기본값인 “Submit”이 렌더링될 것입니다.
+
+        < button type="submit">
+          Submit
+        < /button>
+
+        하지만 슬롯에 어떤 내용을 전달하면
+
+        < submit-button>
+          Save
+        < /submit-button>
+
+        전달된 내용이 렌더링되겠죠.
+
+        < button type="submit">
+          Save
+        < /button>
+      </code>
+    </pre>
+
+    <div id="example-2">
+      <span>default 표기 : </span><submit-button></submit-button>
+      <br/>
+      <span>buttonName 표기 : </span><submit-button>ButtonName</submit-button>
+    </div>
+    <script>
+      Vue.component('submit-button', {
+        template: `
+          <button type="submit">
+            <slot>default</slot>
+          </button>
+        `
+      })
+
+      new Vue({
+        el: '#example-2'
+      })
+    </script>
+  </div>
+
+  <div>
+    <h2>이름이 있는 슬롯(Named Slots)</h2>
+
+    <p>여러 개의 슬롯을 쓰면 더 유용할 때가 있습니다. 예를 들어 < base-layout> 컴포넌트의 아래 템플릿을 봅시다.</p>
+    <pre>
+      <code>
+        < div class="container">
+          < header>
+            <!-- 헤더는 여기에 넣을 겁니다 -->
+          < /header>
+          < main>
+            <!-- 본문은 여기에 넣을 겁니다 -->
+          < /main>
+          < footer>
+            <!-- 푸터는 여기에 넣을 겁니다 -->
+          < /footer>
+        < /div>
+
+        이런 경우를 위해서 < slot> 요소는 서로 다른 슬롯들을 정의할 때 쓸 수 있는 name이라는 특별한 속성을 가지고 있습니다.
+
+        < div class="container">
+          < header>
+            < slot name="header">< /slot>
+          < /header>
+          < main>
+            < slot>< /slot>
+          < /main>
+          < footer>
+            < slot name="footer">< /slot>
+          < /footer>
+        < /div>
+
+        name이 지정되지 않은 < slot>에는 암묵적으로 “default” 값이 사용됩니다.
+
+        이름이 있는 슬롯에 내용을 전달하려면 < template>에 v-slot 디렉티브를 쓰고 그 속성에 앞에서 지정한 ‘name’을 넣으면 됩니다.
+
+        < base-layout>
+          < template v-slot:header> // #header 단축표기
+            < h1>Here might be a page title< /h1>
+          < /template>
+
+          < p>A paragraph for the main content.< /p>
+          < p>And another one.< /p>
+
+          < template v-slot:footer> // #footer 단축표기
+            < p>Here's some contact info< /p>
+          < /template>
+        < /base-layout>
+      </code>
+    </pre>
+
+    <div>
+      <h2>범위가 있는 슬롯(scoped Slots)</h2>
+
+      <p>어떨 때는 자식 컴포넌트에서만 접근할 수 있는 데이터에서 슬롯에 필요한 내용을 가져와야 할 수 있습니다.</p>
+      <p>아래 템플릿의 < current-user> 컴포넌트의 예를 살펴봅시다.</p>
+
+      <pre>
+        <code>
+          < span>
+            < slot>{{ user.lastName }}< /slot>
+          < /span>
+
+          아래와 같이 기본값을 사용자의 성말고 이름으로 바꾸고 싶을 수도 있습니다.
+
+          < current-user>
+            {{ user.firstName }}
+          < /current-user>
+
+          하지만 이 파일은 작동하지 않습니다.
+          왜냐하면 < current-user> 컴포넌트만 user에 접근할 수 있는데 슬롯에 제공되는 내용들은 부모 컴포넌트에서 렌더링되기 때문입니다.
+
+          부모 컴포넌트의 슬롯에서 user를 쓸려면 user를 < slot> 요소에 속성으로 연결해야 합니다.
+
+          < span>
+            < slot v-bind:user="user">
+              {{ user.lastName }}
+            < /slot>
+          < /span>
+        </code>
+      </pre>
+
+      <div id="example-3">
+        <current-user :user="user">
+          {{ user.firstName }}
+        </current-user>
+      </div>
+      <script>
+        Vue.component('current-user', {
+          props: ['user'],
+          template: `
+            <span>
+              <slot>{{ user.firstName }}</slot>
+            </span>
+          `
+        })
+
+        new Vue({
+          el: '#example-3',
+          data: {
+            user: {
+              firstName: '상현',
+              lastName: '주'
+            }
+          }
+        })
+      </script>
+    </div>
+  </div>
+</div>
+</body>
+</html>
